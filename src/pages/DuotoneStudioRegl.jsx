@@ -6,6 +6,8 @@ import ColorPicker from "../components/ColorPicker";
 import createREGL from "regl";
 
 export default function DuotoneStudioRegl() {
+  const stageRef = useRef(null);
+
   const [fileUrl, setFileUrl] = useState(null);
   const [imgEl, setImgEl] = useState(null);
   const [shadowColor, setShadowColor] = useState("#1b602f");
@@ -180,7 +182,7 @@ export default function DuotoneStudioRegl() {
     if (!regl) return;
     if (!imgEl) { textureRef.current = null; return; }
 
-    const { pixelW, pixelH } = sizeCanvasToImage(canvasRef.current, imgEl);
+    const { pixelW, pixelH } = sizeCanvasToImage(canvasRef.current, imgEl, stageRef.current);
     // textureRef.current = regl.texture(imgEl);
     textureRef.current = regl.texture({
       data: imgEl,
@@ -193,7 +195,7 @@ export default function DuotoneStudioRegl() {
   useEffect(() => {
     const onResize = () => {
       if (!imgEl) return;
-      const { pixelW, pixelH } = sizeCanvasToImage(canvasRef.current, imgEl);
+      const { pixelW, pixelH } = sizeCanvasToImage(canvasRef.current, imgEl, stageRef.current);
       render({ canvasW: pixelW, canvasH: pixelH });
     };
     window.addEventListener("resize", onResize);
@@ -338,15 +340,23 @@ export default function DuotoneStudioRegl() {
   };
 
   // Set ukuran canvas mengikuti rasio image (CSS & pixel size)
-  function sizeCanvasToImage(canvas, img, maxW = 1000, maxH = 700) {
+  function sizeCanvasToImage(canvas, img, stageEl, maxDesk = 1000, maxMob = 600) {
     const dpr = window.devicePixelRatio || 1;
-    const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+    const stageW = Math.max(1, (stageEl?.clientWidth || window.innerWidth)); // lebar ruang tersedia
+    const isMobile = stageW < 576; // breakpoint kira-kira (Bootstrap sm)
+    const maxCssW = Math.min(stageW, isMobile ? maxMob : maxDesk);
+
+    // skala menjaga rasio gambar, tidak melebihi lebar maksimum dan dimensi asli
+    const scale = Math.min(maxCssW / img.width, 1);
     const cssW = Math.round(img.width * scale);
     const cssH = Math.round(img.height * scale);
+
+    // atur ukuran CSS (untuk layout) & pixel (untuk ketajaman)
     canvas.style.width = cssW + "px";
     canvas.style.height = cssH + "px";
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);
+
     return { pixelW: canvas.width, pixelH: canvas.height };
   }
 
@@ -357,13 +367,15 @@ export default function DuotoneStudioRegl() {
           <div className="row mb-3">
             <div className="col">
               <h1 className="h4 text-white">Duotone Filter — GPU (regl)</h1>
-              <p className="text-secondary mb-0">Real-time duotone via WebGL, kompatibel React 19.</p>
+              <p className="text-secondary mb-0">Duotone via WEBGL</p>
             </div>
           </div>
 
           <div className="row">
             <div className="col-md-8 mb-3 text-center">
-              <canvas ref={canvasRef} className="border border-secondary rounded" />
+              <div ref={stageRef} className="mx-auto" style={{ maxWidth: "100%", overflow: "hidden" }}>
+                <canvas ref={canvasRef} className="border border-secondary rounded d-block mx-auto" />
+              </div>
               <div className="mt-3 d-flex flex-wrap gap-2 justify-content-center">
                 <button onClick={() => inputRef.current?.click()} className="btn btn-primary">Upload</button>
                 <input ref={inputRef} type="file" accept="image/*" onChange={onPickFile} className="d-none" />
@@ -396,7 +408,7 @@ export default function DuotoneStudioRegl() {
       </main>
 
       <footer className="text-center py-3 text-muted bg-dark border-top border-secondary">
-        Made with ❤️ 2025 A.C.A.B
+        Made with ❤️ 2025 | Omke Gams Omke Gams | kersane ._.
       </footer>
     </div>
   );
