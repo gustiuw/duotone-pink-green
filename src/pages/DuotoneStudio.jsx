@@ -5,6 +5,11 @@ import ColorPicker from "../components/ColorPicker";
 import { hexToRgb, lerp, clamp } from "../utils/colorUtils";
 
 export default function DuotoneStudio() {
+
+  useEffect(() => {
+    document.title = "Duotone Studio — Bootstrap Version (G)"; 
+  }, []);
+
   const [fileUrl, setFileUrl] = useState(null);
   const [shadowColor, setShadowColor] = useState("#1b602f");
   const [highlightColor, setHighlightColor] = useState("#f784c5");
