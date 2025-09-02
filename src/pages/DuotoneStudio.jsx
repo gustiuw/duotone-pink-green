@@ -7,7 +7,7 @@ import { hexToRgb, lerp, clamp } from "../utils/colorUtils";
 export default function DuotoneStudio() {
 
   useEffect(() => {
-    document.title = "Duotone Studio — Bootstrap Version (G)"; 
+    document.title = "Duotone Studio — Bootstrap Version (G)";
   }, []);
 
   const [fileUrl, setFileUrl] = useState(null);
@@ -112,7 +112,7 @@ export default function DuotoneStudio() {
           const bg = Math.round(lerp(g, dg, s));
           const bb = Math.round(lerp(bl, db, s));
 
-          data[i]     = clamp(br * cFactor + cBias + 255 * b * 0.5);
+          data[i] = clamp(br * cFactor + cBias + 255 * b * 0.5);
           data[i + 1] = clamp(bg * cFactor + cBias + 255 * b * 0.5);
           data[i + 2] = clamp(bb * cFactor + cBias + 255 * b * 0.5);
           data[i + 3] = 255; // ensure opaque pixel
@@ -129,58 +129,66 @@ export default function DuotoneStudio() {
   }, [fileUrl, shadowColor, highlightColor, strength, brightness, contrast]);
 
   return (
-    <div className="container py-4">
-      <div className="row mb-4">
-        <div className="col">
-          <h1 className="h3">Duotone Filter — Pink/Green</h1>
-          <p className="text-muted">Upload a photo, then tune the duotone to mimic the pink/green look.</p>
-        </div>
-      </div>
+    <div className="d-flex flex-column min-vh-100">
+      <main className="flex-grow-1">
 
-      <div className="row">
-        <div className="col-md-8 mb-3">
-          <div className="card">
-            <div className="card-body d-flex justify-content-center align-items-center" style={{ minHeight: "300px" }}>
-              {fileUrl ? (
-                <canvas ref={canvasRef} className="img-fluid" />
-              ) : (
-                <div className="text-muted text-center">
-                  <p className="fw-bold">No image yet</p>
-                  <p>Choose a photo to begin.</p>
-                </div>
-              )}
+        <div className="container py-4">
+          <div className="row mb-4">
+            <div className="col">
+              <h1 className="h3">Duotone Filter — Pink/Green</h1>
+              <p className="text-muted">Upload a photo, then tune the duotone to mimic the pink/green look.</p>
             </div>
           </div>
-          <div className="mt-3 d-flex gap-2">
-            <button onClick={() => inputRef.current?.click()} className="btn btn-primary">Upload image</button>
-            <input ref={inputRef} type="file" accept="image/*" onChange={onPickFile} className="d-none" />
-            {downloadHref && (
-              <a href={downloadHref} download="duotone.png" className="btn btn-success">Download PNG</a>
-            )}
-            <button onClick={reset} className="btn btn-secondary">Reset</button>
-          </div>
-        </div>
 
-        <div className="col-md-4">
-          <div className="card">
-            <div className="card-body">
-              <Section title="Colors">
-                <div className="row g-2">
-                  <div className="col"><ColorPicker label="Shadows" value={shadowColor} onChange={setShadowColor} /></div>
-                  <div className="col"><ColorPicker label="Highlights" value={highlightColor} onChange={setHighlightColor} /></div>
+          <div className="row">
+            <div className="col-md-8 mb-3">
+              <div className="card">
+                <div className="card-body d-flex justify-content-center align-items-center" style={{ minHeight: "300px" }}>
+                  {fileUrl ? (
+                    <canvas ref={canvasRef} className="img-fluid" />
+                  ) : (
+                    <div className="text-muted text-center">
+                      <p className="fw-bold">No image yet</p>
+                      <p>Choose a photo to begin.</p>
+                    </div>
+                  )}
                 </div>
-              </Section>
-              <Section title="Intensity">
-                <Slider label={`Strength: ${(strength * 100).toFixed(0)}%`} min={0} max={1} step={0.01} value={strength} onChange={setStrength} />
-              </Section>
-              <Section title="Tone">
-                <Slider label={`Brightness: ${brightness}`} min={-100} max={100} step={1} value={brightness} onChange={setBrightness} />
-                <Slider label={`Contrast: ${contrast}`} min={-100} max={100} step={1} value={contrast} onChange={setContrast} />
-              </Section>
+              </div>
+              <div className="mt-3 d-flex gap-2">
+                <button onClick={() => inputRef.current?.click()} className="btn btn-primary">Upload image</button>
+                <input ref={inputRef} type="file" accept="image/*" onChange={onPickFile} className="d-none" />
+                {downloadHref && (
+                  <a href={downloadHref} download="duotone.png" className="btn btn-success">Download PNG</a>
+                )}
+                <button onClick={reset} className="btn btn-secondary">Reset</button>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="card">
+                <div className="card-body">
+                  <Section title="Colors">
+                    <div className="row g-2">
+                      <div className="col"><ColorPicker label="Shadows" value={shadowColor} onChange={setShadowColor} /></div>
+                      <div className="col"><ColorPicker label="Highlights" value={highlightColor} onChange={setHighlightColor} /></div>
+                    </div>
+                  </Section>
+                  <Section title="Intensity">
+                    <Slider label={`Strength: ${(strength * 100).toFixed(0)}%`} min={0} max={1} step={0.01} value={strength} onChange={setStrength} />
+                  </Section>
+                  <Section title="Tone">
+                    <Slider label={`Brightness: ${brightness}`} min={-100} max={100} step={1} value={brightness} onChange={setBrightness} />
+                    <Slider label={`Contrast: ${contrast}`} min={-100} max={100} step={1} value={contrast} onChange={setContrast} />
+                  </Section>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+      <footer className="text-center py-3 text-muted bg-light">
+        © 2025 A.C.A.B
+      </footer>
     </div>
   );
 }
