@@ -2,17 +2,30 @@ import { useCallback } from "react";
 import { hexToVec3 } from "../utils/color";
 import { readPixelsToCanvas } from "../utils/canvas";
 
+const extFromFormat = (format) => {
+  switch (format) {
+    case "image/png": return "png";
+    case "image/jpeg": return "jpg";
+    case "image/avif": return "avif";
+    case "image/webp":
+    default: return "webp";
+  }
+};
+
 export function useExporters(ctx) {
   const {
-    mode, imgEl,
+    mode, imgEl, fileName,  // ← pastikan ada fileName dari context
     duoShadow, duoHighlight, duoStrength, duoBrightness, duoContrast,
     triA, triB, triC, t1, t2, soft, triStrength, triBrightness, triContrast, origMix,
     reglRef, drawDuoRef, drawTriRef
   } = ctx;
 
+  const safeBase = (fileName || "tone").trim().replace(/\s+/g, "_");
+
   const exportGeneric = useCallback(async ({ format = "image/webp", quality = 0.9, maxSide = 2000 } = {}) => {
     const regl = reglRef.current;
     if (!regl || !imgEl) return;
+
     const scale = Math.min(maxSide / imgEl.width, maxSide / imgEl.height, 1);
     const W = Math.max(1, Math.floor(imgEl.width * scale));
     const H = Math.max(1, Math.floor(imgEl.height * scale));
@@ -41,14 +54,17 @@ export function useExporters(ctx) {
       if (outCanvas.toBlob) outCanvas.toBlob(resolve, format, quality);
       else { const url = outCanvas.toDataURL(format, quality); fetch(url).then(r => r.blob()).then(resolve); }
     });
+
+    const outExt = extFromFormat(format);
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `download-${Date.now()}.${format === "image/jpeg" ? "jpg" : format === "image/png" ? "png" : format === "image/avif" ? "avif" : "webp"}`;
+    a.download = `${safeBase}_${mode}.${outExt}`; // ← tanpa ekstensi lama
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 3000);
     fbo.destroy && fbo.destroy();
   }, [
-    mode, imgEl, duoShadow, duoHighlight, duoStrength, duoBrightness, duoContrast,
+    mode, imgEl, safeBase,
+    duoShadow, duoHighlight, duoStrength, duoBrightness, duoContrast,
     triA, triB, triC, t1, t2, soft, triStrength, triBrightness, triContrast, origMix,
     reglRef, drawDuoRef, drawTriRef
   ]);
@@ -56,10 +72,12 @@ export function useExporters(ctx) {
   const exportPNGHiRes = useCallback((maxW = 4096, maxH = 4096) => {
     const regl = reglRef.current;
     if (!regl || !imgEl) return;
+
     const scale = Math.min(maxW / imgEl.width, maxH / imgEl.height, 1);
     const W = Math.max(1, Math.floor(imgEl.width * scale));
     const H = Math.max(1, Math.floor(imgEl.height * scale));
     const fbo = regl.framebuffer({ width: W, height: H });
+
     fbo.use(() => {
       regl.clear({ color: [0, 0, 0, 0], depth: 1 });
       if (mode === "duotone") {
@@ -77,14 +95,16 @@ export function useExporters(ctx) {
         });
       }
     });
+
     const outCanvas = readPixelsToCanvas(regl, fbo, W, H);
     const a = document.createElement("a");
     a.href = outCanvas.toDataURL("image/png");
-    a.download = `tone.png`;
+    a.download = `${safeBase}_${mode}.png`; // ← tanpa ekstensi lama
     a.click();
     fbo.destroy && fbo.destroy();
   }, [
-    mode, imgEl, duoShadow, duoHighlight, duoStrength, duoBrightness, duoContrast,
+    mode, imgEl, safeBase,
+    duoShadow, duoHighlight, duoStrength, duoBrightness, duoContrast,
     triA, triB, triC, t1, t2, soft, triStrength, triBrightness, triContrast, origMix,
     reglRef, drawDuoRef, drawTriRef
   ]);

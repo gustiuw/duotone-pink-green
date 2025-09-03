@@ -9,6 +9,8 @@ export function useToneState() {
   const [mode, setMode] = useState("duotone"); // 'duotone' | 'tritone'
   const [fileUrl, setFileUrl] = useState(null);
   const [imgEl, setImgEl] = useState(null);
+  const [fileName, setFileName] = useState(null); // ← NEW
+
 
   // Duotone state
   const [duoShadow, setDuoShadow] = useState("#1b602f");
@@ -76,6 +78,7 @@ export function useToneState() {
     const f = e.target.files?.[0];
     if (!f) return;
     setFileUrl(URL.createObjectURL(f));
+    setFileName(toBaseName(f.name)); // ← simpan base TANPA ekstensi
   }, []);
 
   const cycleTriColors = useCallback(() => {
@@ -86,6 +89,16 @@ export function useToneState() {
     setDuoShadow((prev) => { const next = duoHighlight; setDuoHighlight(prev); return next; });
   }, [duoHighlight]);
 
+  const toBaseName = (name) => {
+    if (!name) return "tone";
+    // ambil bagian setelah slash/backslash (kalau ada path)
+    const justName = name.split(/[/\\]/).pop();
+    // hapus ekstensi terakhir (kalau ada)
+    const noExt = justName.replace(/\.[^./\\]+$/, "");
+    // rapihin spasi -> underscore
+    return noExt.trim().replace(/\s+/g, "_");
+  };
+
   return {
     // mount refs
     stageRef, canvasRef,
@@ -93,6 +106,7 @@ export function useToneState() {
     // state
     mode, setMode,
     fileUrl, setFileUrl, imgEl, setImgEl,
+    fileName,
     duoShadow, duoHighlight, duoStrength, duoBrightness, duoContrast,
     setDuoShadow, setDuoHighlight, setDuoStrength, setDuoBrightness, setDuoContrast,
     triA, triB, triC, t1, t2, soft, triStrength, triBrightness, triContrast, origMix,
