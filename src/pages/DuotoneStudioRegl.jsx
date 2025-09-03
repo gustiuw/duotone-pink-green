@@ -37,7 +37,6 @@ function DuotonePageInner() {
                 <input ref={inputRef} type="file" accept="image/*" onChange={onPickFile} className="d-none" />
                 <button onClick={downloadCompressed} className="btn btn-success" disabled={!imgEl}>Download</button>
                 <button onClick={swapColors} className="btn btn-outline-light">Swap Colors</button>
-                <button onClick={downloadPNG} className="btn btn-outline-warning" disabled={!imgEl}>PNG Hi-Res</button>
               </div>
             </div>
 
