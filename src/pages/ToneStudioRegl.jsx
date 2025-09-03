@@ -16,7 +16,7 @@ function ToneStudioInner() {
           <div className="row mb-3 align-items-center">
             <div className="col">
               <h1 className="h4 text-white mb-1">Tone Studio — GPU (regl)</h1>
-              <p className="text-secondary mb-0">Switch between Duotone & Tritone</p>
+              <p className="text-secondary mb-0">Duotone & Tritone with GPU acceleration</p>
             </div>
             <div className="col-auto">
               <div className="btn-group" role="group">
@@ -55,7 +55,7 @@ function ToneStudioInner() {
       </main>
 
       <footer className="text-center py-3 text-muted bg-dark border-top border-secondary">
-        Made with ❤️ 2025 | Tone Studio (regl)
+         Warga bantu warga | GS 
       </footer>
     </div>
   );
